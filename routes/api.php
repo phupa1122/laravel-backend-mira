@@ -22,8 +22,8 @@ use App\Models\User;
 // });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/admin', [AdminController::class, 'index'])->middleware('role:admin');
-    Route::get('/user', [UserController::class, 'index'])->middleware('role:user');
+    Route::get('/dashboard/admin', [AdminController::class, 'index'])->middleware('role:admin');
+    Route::get('/dashboard/user', [UserController::class, 'index'])->middleware('role:user');
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 

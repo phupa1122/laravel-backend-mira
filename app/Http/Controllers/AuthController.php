@@ -13,15 +13,18 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
+            'firstname' => 'required|string',
+            'lastname' => 'required|string',
+            'username' => 'required|string|unique:users',
             'password' => 'required|string|min:6',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'username' => $request->username,
             'password' => Hash::make($request->password),
+            'image' => 'avatar.png',
             'role' => $request->role ?? 'user',
         ]);
 
@@ -34,24 +37,26 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
+    {   
+        \Log::info($request->all());
+        
         $request->validate([
-            'email' => 'required|email',
+            'username' => 'required',
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->only('username', 'password'))) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'username' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = User::where('username', $request->username)->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
             'token' => $token,
+            'role' => $user->role
         ]);
     }
 
